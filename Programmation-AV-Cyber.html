@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#080d18">
+    <title>ACDC80 — Programmation avancée & cybersécurité</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #080d18;
+            --panel: #101a2b;
+            --panel2: #142239;
+            --line: #263750;
+            --text: #edf4ff;
+            --muted: #a7b7ce;
+            --blue: #75baff;
+            --cyan: #72f0df;
+            --violet: #c2a2ff;
+            --green: #8be5ad;
+            --red: #ff9696;
+            --gold: #ffd18a;
+            --radius: 22px;
+            --shadow: 0 24px 80px #0006
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif
+        }
+
+        body {
+            overflow: hidden
+        }
+
+        body:before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 15% 10%, #183a6555, transparent 38%), radial-gradient(ellipse at 90% 85%, #42245a44, transparent 36%), linear-gradient(#ffffff04 1px, transparent 1px), linear-gradient(90deg, #ffffff04 1px, transparent 1px);
+            background-size: auto, auto, 42px 42px, 42px 42px
+        }
+
+        button {
+            font: inherit;
+            color: inherit
+        }
+
+        .deck {
+            height: 100dvh;
+            width: 100%;
+            position: relative;
+            isolation: isolate
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(18px, 4.2vw, 64px) clamp(18px, 7vw, 110px) clamp(62px, 7vh, 78px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px) scale(.99);
+            transition: opacity .42s ease, transform .55s cubic-bezier(.2, .8, .2, 1), visibility .42s;
+            overflow-y: auto;
+            overscroll-behavior: contain
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            z-index: 2
+        }
+
+        .inner {
+            width: min(1180px, 100%);
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: clamp(12px, 2vh, 22px);
+            margin: auto
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            font-size: .74rem;
+            font-weight: 700
+        }
+
+        .eyebrow:before {
+            content: "";
+            width: 24px;
+            height: 2px;
+            background: currentColor
+        }
+
+        .hero {
+            min-height: 70vh;
+            justify-content: center
+        }
+
+        .hero h1 {
+            font: 700 clamp(2.6rem, 6.7vw, 6.5rem)/.99 'Space Grotesk', sans-serif;
+            letter-spacing: -.065em;
+            margin: 0;
+            max-width: 1000px
+        }
+
+        .gradient {
+            background: linear-gradient(100deg, #fff 4%, var(--blue) 48%, var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.35rem);
+            color: var(--muted);
+            max-width: 760px;
+            line-height: 1.65
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .pill {
+            border: 1px solid var(--line);
+            background: #ffffff08;
+            padding: 8px 13px;
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: .83rem
+        }
+
+        .section-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px
+        }
+
+        .num {
+            font: 600 .9rem 'JetBrains Mono';
+            color: var(--cyan);
+            padding-top: 8px
+        }
+
+        .slide h2 {
+            font: 600 clamp(1.65rem, 3.2vw, 3rem)/1.08 'Space Grotesk', sans-serif;
+            letter-spacing: -.035em;
+            margin: 0
+        }
+
+        .lead {
+            font-size: clamp(.95rem, 1.35vw, 1.12rem);
+            color: var(--muted);
+            line-height: 1.65;
+            margin: 0;
+            max-width: 950px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        .grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr))
+        }
+
+        .card {
+            min-width: 0;
+            background: linear-gradient(145deg, #15233aee, #0f1929f5);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: clamp(16px, 2vw, 25px);
+            box-shadow: var(--shadow)
+        }
+
+        .card h3 {
+            font: 600 clamp(1rem, 1.6vw, 1.25rem) 'Space Grotesk';
+            margin: 0 0 10px
+        }
+
+        .card p,
+        .card li {
+            color: var(--muted);
+            font-size: clamp(.84rem, 1.12vw, 1rem);
+            line-height: 1.58
+        }
+
+        .card p {
+            margin: .4rem 0
+        }
+
+        .card ul {
+            margin: 8px 0 0;
+            padding-left: 20px
+        }
+
+        .icon {
+            font-size: 1.45rem;
+            margin-bottom: 12px
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #75baff66;
+            color: var(--blue);
+            background: #75baff12;
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            margin-bottom: 10px
+        }
+
+        .tag.green {
+            color: var(--green);
+            border-color: #8be5ad55;
+            background: #8be5ad10
+        }
+
+        .tag.purple {
+            color: var(--violet);
+            border-color: #c2a2ff55;
+            background: #c2a2ff10
+        }
+
+        .tag.red {
+            color: var(--red);
+            border-color: #ff969655;
+            background: #ff969610
+        }
+
+        .code {
+            background: #070c14;
+            border: 1px solid #283950;
+            border-radius: 14px;
+            overflow: hidden;
+            min-width: 0
+        }
+
+        .codebar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #ffffff06;
+            border-bottom: 1px solid #263750;
+            color: #8fa5c0;
+            font: 500 .72rem 'JetBrains Mono'
+        }
+
+        .dots {
+            display: flex;
+            gap: 5px
+        }
+
+        .dots i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4b607a
+        }
+
+        .code pre {
+            margin: 0;
+            padding: clamp(13px, 1.5vw, 20px);
+            overflow: auto;
+            max-height: 36vh;
+            color: #d7e6fb;
+            font: clamp(.72rem, 1vw, .9rem)/1.62 'JetBrains Mono', monospace;
+            tab-size: 4;
+            white-space: pre
+        }
+
+        .kw {
+            color: #ff9fba
+        }
+
+        .str {
+            color: #b8e994
+        }
+
+        .fn {
+            color: #8edbff
+        }
+
+        .comment {
+            color: #7f94ad
+        }
+
+        .numcode {
+            color: #d6b1ff
+        }
+
+        .callout {
+            border-left: 3px solid var(--cyan);
+            background: #72f0df0b;
+            padding: 13px 16px;
+            border-radius: 0 12px 12px 0;
+            color: #c8d8ec;
+            font-size: .9rem;
+            line-height: 1.55
+        }
+
+        .callout.warn {
+            border-color: var(--gold);
+            background: #ffd18a0b
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px
+        }
+
+        .step {
+            padding: 15px;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: #ffffff05
+        }
+
+        .step b {
+            display: block;
+            color: var(--cyan);
+            font: 600 .8rem 'JetBrains Mono';
+            margin-bottom: 7px
+        }
+
+        .step span {
+            font-size: .88rem;
+            line-height: 1.45;
+            color: var(--muted)
+        }
+
+        .exercise {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start
+        }
+
+        .exercise .n {
+            display: grid;
+            place-items: center;
+            flex: 0 0 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: #75baff18;
+            color: var(--blue);
+            font: 600 .9rem 'JetBrains Mono'
+        }
+
+        .exercise h3 {
+            margin: 2px 0 6px
+        }
+
+        .exercise p {
+            margin: 0
+        }
+
+        .hint {
+            color: var(--gold);
+            font-size: .8rem;
+            margin-top: 8px
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 18px;
+            left: clamp(18px, 4vw, 56px);
+            right: clamp(18px, 4vw, 56px);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #8093ad;
+            font: 500 .72rem 'JetBrains Mono'
+        }
+
+        .progress {
+            height: 3px;
+            flex: 1;
+            background: #24344b;
+            border-radius: 5px;
+            overflow: hidden
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            transition: width .35s ease
+        }
+
+        .footer-right {
+            white-space: nowrap
+        }
+
+        .key {
+            display: inline-block;
+            border: 1px solid #526680;
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            padding: 3px 6px;
+            color: #c6d5e8;
+            margin: 0 2px
+        }
+
+
+        @keyframes enter {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .active .inner>* {
+            animation: enter .5s both
+        }
+
+        .active .inner>*:nth-child(2) {
+            animation-delay: .07s
+        }
+
+        .active .inner>*:nth-child(3) {
+            animation-delay: .13s
+        }
+
+        .active .inner>*:nth-child(4) {
+            animation-delay: .19s
+        }
+
+        .active .inner>*:nth-child(5) {
+            animation-delay: .25s
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+
+        @media(max-width:760px) {
+            .slide {
+                padding: 20px 17px 65px;
+                align-items: flex-start
+            }
+
+            .inner {
+                gap: 13px;
+                margin: auto
+            }
+
+            .grid,
+            .grid.three {
+                grid-template-columns: 1fr
+            }
+
+            .slide h2 {
+                font-size: clamp(1.45rem, 6vw, 2rem)
+            }
+
+            .card {
+                padding: 15px;
+                border-radius: 16px
+            }
+
+            .card p,
+            .card li {
+                font-size: .88rem
+            }
+
+            .lead {
+                font-size: .93rem
+            }
+
+            .code pre {
+                max-height: 28vh;
+                font-size: .72rem
+            }
+
+            .steps {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+
+            .hero {
+                min-height: 65vh
+            }
+
+            .hero h1 {
+                font-size: clamp(2.5rem, 12vw, 4.3rem)
+            }
+
+            .orb {
+                right: -25%;
+                top: 3%;
+                opacity: .55
+            }
+
+            .footer {
+                bottom: 10px;
+                gap: 8px;
+                font-size: .65rem
+            }
+
+            .footer .hintkeys {
+                display: none
+            }
+
+            .section-head {
+                gap: 10px
+            }
+        }
+
+        @media(max-height:760px) and (min-width:761px) {
+            .slide {
+                padding-top: 22px;
+                padding-bottom: 54px
+            }
+
+            .inner {
+                gap: 10px
+            }
+
+            .card {
+                padding: 15px
+            }
+
+            .card p,
+            .card li {
+                line-height: 1.45
+            }
+
+            .code pre {
+                max-height: 27vh;
+                padding: 12px
+            }
+
+            .slide h2 {
+                font-size: clamp(1.45rem, 2.8vw, 2.3rem)
+            }
+
+            .lead {
+                font-size: .94rem
+            }
+
+            .tag {
+                margin-bottom: 5px
+            }
+
+            .icon {
+                margin-bottom: 5px
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+
+            *,
+            *:before,
+            *:after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck" id="deck" aria-label="Présentation de cours">
+        <section class="slide active">
+            <div class="orb"></div>
+            <div class="inner hero">
+                <div class="eyebrow">ACDC80 · Master 1 · Atelier pratique</div>
+                <h1><span class="gradient">Programmation avancée</span><br>& cybersécurité</h1>
+                <p class="subtitle">De Python aux preuves numériques, de Git aux pipelines DevSecOps. Un parcours guidé,
+                    concret et progressif autour d'une enquête numérique fictive.</p>
+                <div class="hero-meta"><span class="pill"> Python · fondamentaux</span><span class="pill">⌘ Git ·
+                        traçabilité</span><span class="pill">◈ DFIR · traitement GPS</span><span class="pill">↗ CI/CD ·
+                        GitHub Actions</span></div>
+                <p class="lead">Navigation au clavier : <span class="key">→</span> <span class="key">Espace</span> pour
+                    avancer · <span class="key">←</span> pour revenir · <span class="key">Home</span>/<span
+                        class="key">End</span> pour début/fin.</p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">01 · Objectifs du cours</div>
+                <div class="section-head"><span class="num">01</span>
+                    <h2>Le fil rouge : transformer des données brutes en résultat vérifiable</h2>
+                </div>
+                <p class="lead">À la fin de l'atelier, vous saurez lire et nettoyer des données, expliquer vos choix,
+                    versionner le code et automatiser une validation reproductible.</p>
+                <div class="grid three">
+                    <div class="card">
+                        <div class="icon"></div>
+                        <h3>Comprendre Python</h3>
+                        <p>Variables, types, chaînes, listes, boucles, fonctions et exceptions — avec des exercices
+                            courts avant le TP.</p>
+                    </div>
+                    <div class="card">
+                        <div class="icon">⌘</div>
+                        <h3>Tracer avec Git</h3>
+                        <p>Suivre les changements, créer des commits cohérents, publier un dépôt et signer ses commits.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div class="icon">🛡️</div>
+                        <h3>Automatiser les contrôles</h3>
+                        <p>Construire un traitement de logs et une pipeline qui échoue clairement si une étape manque.
+                        </p>
+                    </div>
+                </div>
+                <div class="callout">
+                    <b>Points d'appui pour l'introduction :</b>
+                    <ul style="margin: 6px 0 0 20px; padding: 0;">
+                        <li>Les volumes de logs et de données rendent l'analyse manuelle impraticable.</li>
+                        <li>Python sert à automatiser les tâches répétitives.</li>
+                        <li>Git permet de tracer les changements du code.</li>
+                        <li>La conservation des preuves exige une méthode rigoureuse.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">02 · Pourquoi Python en cyber ?</div>
+                <div class="section-head"><span class="num">02</span>
+                    <h2>Python : automatiser l'analyse, pas remplacer le jugement</h2>
+                </div>
+                <p class="lead">En DFIR (Digital Forensics & Incident Response), on traite des journaux, des
+                    horodatages, des fichiers et des indicateurs qui dépassent vite les capacités d'une lecture
+                    manuelle.</p>
+                <div class="grid">
+                    <div class="card"><span class="tag">CAS CONCRET</span>
+                        <h3>Des milliers de lignes de logs</h3>
+                        <p>Extraire les événements d'authentification échoués, convertir les dates, compter les adresses
+                            IP et repérer les anomalies.</p>
+                        <div class="code">
+                            <div class="codebar">exemple.py</div>
+                            <pre>echecs = [ligne for ligne in logs
+          if "LOGIN_FAILED" in ligne]
+print("Échecs :", len(echecs))</pre>
+                        </div>
+                    </div>
+                    <div class="card"><span class="tag green">ATOUTS</span>
+                        <h3>Pourquoi ce langage ?</h3>
+                        <ul>
+                            <li>Lisible : logique facile à expliquer et auditer.</li>
+                            <li>Rapide à prototyper : bibliothèques pour CSV, JSON, dates, hachage.</li>
+                            <li>Reproductible : le même script et les mêmes entrées peuvent être retestés.</li>
+                            <li>Automatisable : s'intègre à GitHub Actions et aux outils d'analyse.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout warn">En investigation réelle : préserver l'original, documenter les opérations et
+                    ne jamais confondre une empreinte de fichier avec une preuve complète de provenance ou
+                    d'authenticité.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">03 · Python · bases</div>
+                <div class="section-head"><span class="num">03</span>
+                    <h2>Variables, types et conversions</h2>
+                </div>
+                <p class="lead">Une variable donne un nom à une valeur. Le type indique les opérations possibles. Les
+                    données lues dans un fichier arrivent souvent sous forme de chaînes.</p>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Les types courants</h3>
+                        <ul>
+                            <li><code>str</code> : texte, ex. <code>"45.76"</code></li>
+                            <li><code>int</code> : entier, ex. <code>12</code></li>
+                            <li><code>float</code> : nombre décimal, ex. <code>45.76</code></li>
+                            <li><code>bool</code> : <code>True</code> ou <code>False</code></li>
+                            <li><code>list</code> : collection ordonnée</li>
+                        </ul>
+                    </div>
+                    <div class="code">
+                        <div class="codebar">types.py</div>
+                        <pre>heure = "12:55:35"       # str
+nb_lignes = 120          # int
+latitude = float("45.76")
+fichier_valide = True
+
+print(type(heure))
+print(latitude + 1.0)
+
+# int("bonjour") -> ValueError</pre>
+                    </div>
+                </div>
+                <div class="callout">À retenir : convertir explicitement avec <code>int()</code>, <code>float()</code>
+                    ou <code>str()</code>. Une conversion peut échouer : anticipez les données mal formées.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">04 · Python · chaînes et collections</div>
+                <div class="section-head"><span class="num">04</span>
+                    <h2>Manipuler du texte comme un analyste</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Nettoyer et découper</h3>
+                        <div class="code">
+                            <div class="codebar">strings.py</div>
+                            <pre>ligne = "  ALERT,192.0.2.8\\n"
+propre = ligne.strip()
+champs = propre.split(",")
+
+print(propre)
+print(champs[0])  # ALERT</pre>
+                        </div>
+                        <p><code>strip()</code> enlève les espaces et retours en bordure. <code>split()</code> découpe
+                            une chaîne selon un séparateur.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Tester, boucler, filtrer</h3>
+                        <div class="code">
+                            <div class="codebar">filter.py</div>
+                            <pre>evenements = [
+    "LOGIN_OK",
+    "LOGIN_FAILED",
+    "LOGOUT"
+]
+
+for event in evenements:
+    if "FAILED" in event:
+        print(event)</pre>
+                        </div>
+                        <p>Une condition choisit le chemin d'exécution. Une boucle répète une action pour chaque
+                            élément.</p>
+                    </div>
+                </div>
+                <div class="callout warn">Attention : <code>split(',')</code> ne comprend pas à lui seul les champs CSV
+                    contenant des virgules entre guillemets. Pour un vrai CSV, préférez le module standard
+                    <code>csv</code>.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">05 · Exercice Python 1</div>
+                <div class="section-head"><span class="num">05</span>
+                    <h2>Échauffement : addition et multiplication</h2>
+                </div>
+                <p class="lead">Écrivez un programme qui demande deux nombres à l'utilisateur, calcule leur somme et
+                    leur produit, puis affiche les deux résultats.</p>
+                <div class="grid">
+                    <div class="card"><span class="tag">À FAIRE · 5 MIN</span>
+                        <h3>Votre mission</h3>
+                        <ol>
+                            <li>Lire deux valeurs avec <code>input()</code>.</li>
+                            <li>Convertir les saisies en nombres.</li>
+                            <li>Calculer la somme et le produit.</li>
+                            <li>Afficher des messages explicites.</li>
+                        </ol>
+                        <p class="hint">Indice : <code>input()</code> renvoie toujours une chaîne.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Exemple de test attendu</h3>
+                        <div class="code">
+                            <div class="codebar">exécution fictive</div>
+                            <pre>Premier nombre : 6
+Deuxième nombre : 4
+Somme : 10
+Produit : 24</pre>
+                        </div>
+                        <p>Testez aussi avec des décimaux et réfléchissez à ce qui arrive si la saisie n'est pas
+                            numérique.</p>
+                    </div>
+                </div>
+                <div class="callout">Objectif pédagogique : comprendre l'entrée utilisateur, la conversion de type, les
+                    opérateurs arithmétiques et l'affichage — sans encore traiter de fichiers.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">06 · Exercice Python 2</div>
+                <div class="section-head"><span class="num">06</span>
+                    <h2>Calculer l'IMC (BMI)</h2>
+                </div>
+                <p class="lead">Écrivez un programme qui demande une taille en mètres et un poids en kilogrammes,
+                    calcule l'IMC et affiche le résultat.</p>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Formule</h3>
+                        <div
+                            style="font:600 clamp(1.4rem,3vw,2.3rem) 'JetBrains Mono';color:var(--cyan);padding:14px 0">
+                            IMC = poids / taille²</div>
+                        <p>Exemple : 70 kg et 1,75 m donnent environ 22,86.</p>
+                        <p class="hint">Indice : l'opérateur puissance en Python est <code>**</code>.</p>
+                    </div>
+                    <div class="card"><span class="tag">À FAIRE · 5 MIN</span>
+                        <h3>Contraintes</h3>
+                        <ul>
+                            <li>Convertir les saisies en <code>float</code>.</li>
+                            <li>Vérifier que la taille est strictement positive.</li>
+                            <li>Afficher l'IMC arrondi à deux décimales avec une f-string.</li>
+                            <li>Réfléchir à la gestion d'une saisie invalide.</li>
+                        </ul>
+                        <p>Ce calcul est un exercice de programmation, pas un diagnostic médical.</p>
+                    </div>
+                </div>
+                <div class="code">
+                    <div class="codebar">formatage.py · exemple de formatage</div>
+                    <pre>valeur = 22.85714
+print(f"Résultat : {valeur:.2f}")  # Résultat : 22.86</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">07 · Exercice Python 3</div>
+                <div class="section-head"><span class="num">07</span>
+                    <h2>Programmer la suite de Fibonacci</h2>
+                </div>
+                <p class="lead">Écrire une fonction <code>fibonacci(n)</code> qui renvoie le \(n\)-ième terme de la
+                    suite commençant par 1, 1, 2, 3, 5, 8…</p>
+                <div class="grid">
+                    <div class="card"><span class="tag">À FAIRE · 10 MIN</span>
+                        <h3>Consignes</h3>
+                        <ul>
+                            <li>Définir le comportement pour un entier inférieur à 1.</li>
+                            <li>Traiter séparément les deux premiers termes.</li>
+                            <li>Calculer les termes suivants à l'aide d'une boucle.</li>
+                            <li>Afficher le résultat avec une f-string.</li>
+                            <li>Tester plusieurs valeurs.</li>
+                        </ul>
+                        <p class="hint">Notions révisées : fonctions, conditions, boucles, variables et cas limites.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Résultats de contrôle</h3>
+                        <table
+                            style="width:100%; border-collapse: collapse; text-align: left; margin-top: 10px; font-size: clamp(.84rem, 1.12vw, 1rem); color: var(--muted);">
+                            <tr style="border-bottom: 1px solid var(--line); color: var(--text);">
+                                <th style="padding: 8px 4px;">Entrée (n)</th>
+                                <th style="padding: 8px 4px;">Résultat attendu</th>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #26375055;">
+                                <td style="padding: 8px 4px;">1</td>
+                                <td style="padding: 8px 4px;">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #26375055;">
+                                <td style="padding: 8px 4px;">2</td>
+                                <td style="padding: 8px 4px;">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #26375055;">
+                                <td style="padding: 8px 4px;">3</td>
+                                <td style="padding: 8px 4px;">2</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 4px;">6</td>
+                                <td style="padding: 8px 4px;">8</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">08 · Exercices de préparation au TP</div>
+                <div class="section-head"><span class="num">08</span>
+                    <h2>Trois défis pour se préparer au traitement de logs</h2>
+                </div>
+                <p class="lead">Ces exercices entraînent les concepts utiles sans donner directement l'algorithme final
+                    du TP GPS.</p>
+                <div class="grid three">
+                    <div class="card exercise">
+                        <div class="n">03</div>
+                        <div>
+                            <h3>Journal d'événements</h3>
+                            <p>À partir d'une liste de messages, compter combien contiennent le mot
+                                <code>WARNING</code>, sans tenir compte des autres lignes.</p>
+                            <p class="hint">Indice : boucle, condition, compteur.</p>
+                        </div>
+                    </div>
+                    <div class="card exercise">
+                        <div class="n">04</div>
+                        <div>
+                            <h3>Horodatage propre</h3>
+                            <p>On reçoit <code>" 08:14:22.987654 "</code>. Produire une chaîne qui ne garde que les
+                                heures, minutes et secondes.</p>
+                            <p class="hint">Indice : <code>strip()</code>, <code>split()</code>.</p>
+                        </div>
+                    </div>
+                    <div class="card exercise">
+                        <div class="n">05</div>
+                        <div>
+                            <h3>Mesures fiables</h3>
+                            <p>Parcourir une liste de valeurs sous forme de texte. Additionner uniquement celles qui
+                                sont numériques et compter les valeurs invalides.</p>
+                            <p class="hint">Indice : <code>try/except ValueError</code>.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout">Pour chaque défi : écrire un exemple d'entrée, prédire le résultat, coder, puis
+                    tester un cas limite. Vous pouvez discuter de votre solution avant de passer à la suite.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">09 · Gestion des erreurs</div>
+                <div class="section-head"><span class="num">09</span>
+                    <h2>Ne pas laisser une donnée inattendue arrêter l'analyse</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Conversion contrôlée</h3>
+                        <div class="code">
+                            <div class="codebar">conversion.py</div>
+                            <pre>texte = "12.5"
+
+try:
+    mesure = float(texte)
+except ValueError:
+    print("Mesure invalide")
+else:
+    print("Mesure :", mesure)</pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Pièges à connaître</h3>
+                        <ul>
+                            <li><code>float("abc")</code> déclenche <code>ValueError</code>.</li>
+                            <li><code>float("nan")</code> produit un NaN : ce n'est pas une erreur de conversion.</li>
+                            <li><code>math.isnan(x)</code> détecte NaN.</li>
+                            <li><code>float("inf")</code> est aussi accepté : pensez à <code>math.isfinite()</code>.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout warn">Un choix métier doit être explicite : ignorer une ligne, la mettre en
+                    quarantaine ou remplacer une valeur ? Un zéro GPS peut être une vraie coordonnée. Ne le choisissez
+                    comme valeur de secours que si le cahier des charges le demande.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">10 · Git · introduction</div>
+                <div class="section-head"><span class="num">10</span>
+                    <h2>Git : mémoire, collaboration et traçabilité du code</h2>
+                </div>
+                <p class="lead">Git est un système de gestion de versions distribué. Il conserve l'historique des
+                    changements d'un projet et permet de revenir à un état antérieur.</p>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Pourquoi en cybersécurité ?</h3>
+                        <ul>
+                            <li>Historique : comprendre quand le script a changé.</li>
+                            <li>Revue : comparer et relire les modifications.</li>
+                            <li>Reproductibilité : retrouver une version du code.</li>
+                            <li>Collaboration : branches, pull requests et validation.</li>
+                            <li>CI/CD : déclencher des tests sur des changements.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Les commandes essentielles</h3>
+                        <div class="code">
+                            <div class="codebar">terminal</div>
+                            <pre>git init
+git status
+git add parse_gps.py
+git commit -m "Ajoute le parseur GPS"
+git log --oneline
+git diff</pre>
+                        </div>
+                        <p><code>add</code> prépare les changements ; <code>commit</code> enregistre un instantané dans
+                            l'historique local.</p>
+                    </div>
+                </div>
+                <div class="callout warn">Nuance importante : Git seul ne prouve pas l'identité réelle de l'auteur ni la
+                    valeur juridique d'un artefact. Les signatures, les contrôles d'accès, les journaux et la procédure
+                    de conservation sont complémentaires.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">11 · Git · cycle de travail</div>
+                <div class="section-head"><span class="num">11</span>
+                    <h2>Du fichier modifié au commit</h2>
+                </div>
+                <div class="steps">
+                    <div class="step"><b>01 · WORKTREE</b><span>Modifier les fichiers et vérifier le diff.</span></div>
+                    <div class="step"><b>02 · STAGE</b><span>Choisir précisément ce qui entre dans le commit.</span>
+                    </div>
+                    <div class="step"><b>03 · COMMIT</b><span>Créer un instantané avec un message utile.</span></div>
+                    <div class="step"><b>04 · PUSH</b><span>Publier les commits sur le dépôt distant.</span></div>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Commandes à pratiquer</h3>
+                        <div class="code">
+                            <div class="codebar">terminal</div>
+                            <pre>git status
+git diff
+git add parse_gps.py
+git diff --staged
+git commit -m "Ajoute le nettoyage des logs"
+git push</pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Bonnes habitudes</h3>
+                        <ul>
+                            <li>Un commit = un changement cohérent.</li>
+                            <li>Un message décrit l'intention : « corrige le parsing des dates ».</li>
+                            <li>Ne jamais committer de secrets, clés privées ou données sensibles.</li>
+                            <li>Relire <code>git diff --staged</code> avant le commit.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">12 · Atelier Git · signatures</div>
+                <div class="section-head"><span class="num">12</span>
+                    <h2>Signer ses commits avec une clé SSH</h2>
+                </div>
+                <p class="lead">Un commit signé apporte une preuve cryptographique liée à une clé
+                    (<strong>non-répudiation</strong>) et active le badge <span class="tag green"
+                        style="padding: 2px 6px; margin-bottom: 0;">Verified</span> sur GitHub.<br><span
+                        style="color:var(--gold)">Nuance :</span> Il ne prouve pas à lui seul l'identité réelle de son
+                    détenteur ni la véracité du contenu.</p>
+                <div class="code">
+                    <div class="codebar">terminal · créer la clé si nécessaire</div>
+                    <pre>ssh-keygen -t ed25519 -C "votre_email@example.com"
+
+git config --global user.name "Votre Nom"
+git config --global user.email "votre_email@example.com"
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global commit.gpgsign true
+
+cat ~/.ssh/id_ed25519.pub</pre>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Sur GitHub</h3>
+                        <ol>
+                            <li>Ouvrir Settings → SSH and GPG keys.</li>
+                            <li>Choisir New SSH key.</li>
+                            <li>Choisir le type de clé « Signing Key ».</li>
+                            <li>Coller le contenu de la clé publique.</li>
+                            <li>Créer un commit signé et vérifier son statut.</li>
+                        </ol>
+                    </div>
+                    <div class="card">
+                        <h3>Vérifications</h3>
+                        <div class="code">
+                            <div class="codebar">terminal</div>
+                            <pre>git config --get gpg.format
+git config --get user.signingkey
+git log --show-signature -1
+git commit -S -m "Teste la signature"</pre>
+                        </div>
+                        <p class="hint">La clé privée reste sur votre machine : ne la publiez jamais et ne la
+                            transmettez pas au dépôt.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">13 · Scénario d'enquête fictif</div>
+                <div class="section-head"><span class="num">13</span>
+                    <h2>Affaire « Ghost Delacroix » : votre mission</h2>
+                </div>
+                <p class="lead">Dans ce scénario pédagogique fictif, une équipe d'investigation doit examiner un export
+                    GPS issu d'un traceur embarqué. Le fichier contient des formats mixtes, des champs manquants et des
+                    enregistrements répétés.</p>
+                <div class="grid">
+                    <div class="card"><span class="tag purple">ENTRÉE</span>
+                        <h3><code>input_log.txt</code></h3>
+                        <p>Un dump brut à préserver. Les lignes utiles peuvent contenir <code>GNSS_ACCESS_LIB</code> ou
+                            <code>Trip Data | Start | Latitude:</code>.</p>
+                        <p>Exemple de ligne : <code>1176,2019/10/25,12:55:35.357444,"45.76, 4.83",GNSS_ACCESS_LIB</code>
+                        </p>
+                    </div>
+                    <div class="card"><span class="tag green">SORTIE ATTENDUE</span>
+                        <h3><code>output_cleaned.csv</code></h3>
+                        <p>Des colonnes documentées, des heures normalisées, des coordonnées nettoyées et des doublons
+                            traités selon une règle définie.</p>
+                        <p>Le script doit être relançable et produire un résultat vérifiable.</p>
+                    </div>
+                </div>
+                <div class="callout warn">Scénario inventé pour l'enseignement. En situation réelle, respecter le cadre
+                    légal, limiter l'accès aux données et préserver l'original en lecture seule avec une traçabilité
+                    adaptée.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">14 · Cahier des charges</div>
+                <div class="section-head"><span class="num">14</span>
+                    <h2>Transformer les consignes en règles testables</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Extraction & normalisation</h3>
+                        <ul>
+                            <li>Ne retenir que les lignes correspondant aux marqueurs prévus.</li>
+                            <li>Récupérer date, heure, latitude et longitude, y compris dans les formats documentés.
+                            </li>
+                            <li>Supprimer les microsecondes : <code>hh:mm:ss</code>.</li>
+                            <li>Arrondir les coordonnées conservées à deux décimales.</li>
+                            <li>Compléter les coordonnées manquantes/corrompues avec <code>+0.000000</code> si la règle
+                                métier l'exige.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Qualité & dédoublonnage</h3>
+                        <ul>
+                            <li>Écarter les NaN et les valeurs non finies selon la politique définie.</li>
+                            <li>Ne pas exporter l'index source comme colonne métier.</li>
+                            <li>Supprimer les doublons géographiques avec la tolérance définie.</li>
+                            <li>Produire un CSV stable et documenté.</li>
+                            <li>Tester les cas limites et rendre les choix explicites.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout warn">Point à clarifier avant de coder : « doublons à ±1° » signifie-t-il comparer
+                    chaque point à tous les points conservés, ou regrouper des points par zone ? Cette règle n'est pas
+                    une simple égalité et peut supprimer des positions légitimes. La faire valider par l'enseignant.
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">15 · Étape 1 du TP</div>
+                <div class="section-head"><span class="num">15</span>
+                    <h2>Lire le fichier sans perdre le contrôle</h2>
+                </div>
+                <p class="lead">Le passage d'un fichier brut à des données structurées demande d'anticiper les erreurs
+                    courantes lors de la lecture.</p>
+                <div class="grid">
+                    <div class="code">
+                        <div class="codebar">parse_gps.py · squelette</div>
+                        <pre>def lire_et_filtrer_fichier(chemin_fichier):
+    lignes_utiles = []
+
+    with open(chemin_fichier, "r",
+              encoding="latin-1") as fichier:
+        for ligne in fichier:
+            ligne = ligne.strip()
+
+            # TODO : ignorer les lignes vides
+            # TODO : tester les marqueurs acceptés
+            pass
+
+    return lignes_utiles</pre>
+                    </div>
+                    <div class="card">
+                        <h3>3 pièges à éviter</h3>
+                        <ul style="list-style:none; padding:0; margin:0;">
+                            <li style="margin-bottom:14px;"><span class="tag purple">ENCODAGE</span> Choisir entre
+                                UTF-8, Latin-1 ou un autre encodage selon le fichier source pour éviter de corrompre les
+                                caractères.</li>
+                            <li style="margin-bottom:14px;"><span class="tag green">FERMETURE</span> Employer
+                                impérativement <code>with open(...)</code> pour garantir la libération de la ressource.
+                            </li>
+                            <li><span class="tag red">CORRUPTION</span> Utiliser <code>try/except</code> pour les
+                                erreurs de conversion et traiter explicitement les valeurs <code>nan</code>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">16 · Étape 2 du TP</div>
+                <div class="section-head"><span class="num">16</span>
+                    <h2>Extraire les champs sans supposer que tout est propre</h2>
+                </div>
+                <p class="lead">Avant de lire des indices comme <code>parts[2]</code>, vérifier que la ligne contient
+                    assez de champs. Pour le format CSV avec champs entre guillemets, utiliser <code>csv.reader</code>
+                    plutôt qu'un simple découpage par virgules.</p>
+                <div class="grid">
+                    <div class="code">
+                        <div class="codebar">démonstration · module csv</div>
+                        <pre>import csv
+
+ligne = (
+    '1176,2019/10/25,12:55:35.357444,'
+    '"45.76, 4.83",GNSS_ACCESS_LIB'
+)
+
+champs = next(csv.reader([ligne]))
+print(champs[2])  # 12:55:35.357444
+print(champs[3])  # 45.76, 4.83</pre>
+                    </div>
+                    <div class="card">
+                        <h3>À faire dans votre fonction</h3>
+                        <ul>
+                            <li>Définir le format attendu pour chaque marqueur.</li>
+                            <li>Vérifier le nombre de champs avant tout accès par index.</li>
+                            <li>Convertir les nombres dans un bloc <code>try/except</code>.</li>
+                            <li>Ne pas confondre chaîne vide, NaN et zéro.</li>
+                            <li>Décider comment signaler une ligne impossible à parser.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout warn">Le second format <code>Trip Data | Start | Latitude:</code> peut être
+                    structuré différemment du CSV d'exemple. Il faut examiner des lignes réelles représentatives avant
+                    de choisir le parseur.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">17 · Étape 3 du TP</div>
+                <div class="section-head"><span class="num">17</span>
+                    <h2>Nettoyer les valeurs et contrôler les limites</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Contrôler une coordonnée</h3>
+                        <div class="code">
+                            <div class="codebar">validation.py · exemple autonome</div>
+                            <pre>import math
+
+def convertir_mesure(texte):
+    try:
+        valeur = float(texte.strip())
+    except ValueError:
+        return None
+
+    if not math.isfinite(valeur):
+        return None
+
+    return valeur</pre>
+                        </div>
+                        <p>Cette fonction renvoie <code>None</code> pour une valeur illisible ou non finie. À vous de
+                            décider comment le TP doit traiter ce cas.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Tests à prévoir</h3>
+                        <ul>
+                            <li>Nombre valide : <code>"45.76"</code></li>
+                            <li>Espaces : <code>" 4.83 "</code></li>
+                            <li>Champ vide : <code>""</code></li>
+                            <li>NaN : <code>"nan"</code></li>
+                            <li>Texte : <code>"inconnu"</code></li>
+                            <li>Latitude hors de [-90, 90] ou longitude hors de [-180, 180]</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">Important : si le cahier des charges impose une valeur de remplacement, documentez
+                    la règle et conservez si possible un compteur des valeurs corrigées. En forensic, les corrections ne
+                    doivent pas être invisibles.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">18 · Étape 4 du TP</div>
+                <div class="section-head"><span class="num">18</span>
+                    <h2>Dédoublonnage : écrire une règle non ambiguë</h2>
+                </div>
+                <p class="lead">Arrondir à deux décimales réduit la précision. Une tolérance de ±1° est beaucoup plus
+                    large que l'arrondi et représente une distance géographique importante : testez son effet avant de
+                    l'appliquer.</p>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Logique à implémenter</h3>
+                        <ol>
+                            <li>Créer une liste de positions retenues.</li>
+                            <li>Pour chaque position candidate, la comparer aux positions retenues.</li>
+                            <li>Appliquer la règle de tolérance validée.</li>
+                            <li>Garder ou rejeter la position, de façon déterministe.</li>
+                        </ol>
+                    </div>
+                    <div class="card">
+                        <h3>Question de conception</h3>
+                        <p>Si A est proche de B, et B proche de C, mais A pas proche de C, faut-il garder A et C ? La
+                            réponse dépend de la règle de regroupement.</p>
+                        <div class="code">
+                            <div class="codebar">pseudo-code · à compléter</div>
+                            <pre>for point in points:
+    doublon = False
+    # TODO : comparer point aux points retenus
+    # TODO : appliquer la tolérance décidée
+    if not doublon:
+        points_retenus.append(point)</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout warn">Le filtrage par latitude/longitude séparées ne mesure pas une distance exacte.
+                    Pour une analyse géographique rigoureuse, utilisez une distance géodésique adaptée et justifiez le
+                    seuil.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">19 · Étape 5 du TP</div>
+                <div class="section-head"><span class="num">19</span>
+                    <h2>Exporter un CSV propre et reproductible</h2>
+                </div>
+                <div class="grid">
+                    <div class="code">
+                        <div class="codebar">export_csv.py · exemple</div>
+                        <pre>import csv
+
+colonnes = ["date", "heure", "latitude", "longitude"]
+
+with open("output_cleaned.csv", "w",
+          newline="", encoding="utf-8") as fichier:
+    writer = csv.DictWriter(
+        fichier, fieldnames=colonnes
+    )
+    writer.writeheader()
+    writer.writerows(enregistrements)</pre>
+                    </div>
+                    <div class="card">
+                        <h3>Vérifier avant de valider</h3>
+                        <ul>
+                            <li>Les noms et l'ordre des colonnes sont-ils stables ?</li>
+                            <li>L'index source est-il absent ?</li>
+                            <li>Les heures suivent-elles le format annoncé ?</li>
+                            <li>Les coordonnées sont-elles numériques et arrondies ?</li>
+                            <li>Le fichier est-il lisible par un second outil Python ?</li>
+                        </ul>
+                        <div class="callout">Un CSV est un format d'échange : le module <code>csv</code> gère les
+                            guillemets et séparateurs correctement.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">20 · Intégrité · SHA-256</div>
+                <div class="section-head"><span class="num">20</span>
+                    <h2>Calculer une empreinte du fichier exporté</h2>
+                </div>
+                <p class="lead">SHA-256 calcule une empreinte du contenu exact d'un fichier. Une modification, même
+                    minime, change généralement l'empreinte. Pour comparer des empreintes, il faut comparer le même
+                    fichier octet pour octet.</p>
+                <div class="grid">
+                    <div class="code">
+                        <div class="codebar">hash_csv.py</div>
+                        <pre>import hashlib
+
+def sha256_fichier(chemin):
+    h = hashlib.sha256()
+    with open(chemin, "rb") as fichier:
+        for bloc in iter(
+            lambda: fichier.read(65536), b""
+        ):
+            h.update(bloc)
+    return h.hexdigest()
+
+empreinte = sha256_fichier("output_cleaned.csv")
+print("SHA-256 :", empreinte)
+print("Identifiant pédagogique :", empreinte[:12])</pre>
+                    </div>
+                    <div class="card">
+                        <h3>Ce que le hash prouve — et ne prouve pas</h3>
+                        <ul>
+                            <li>✔ Permet de détecter si le contenu comparé a changé.</li>
+                            <li>✔ Permet de vérifier que deux copies sont identiques.</li>
+                            <li>✘ Ne prouve pas qui a créé le fichier.</li>
+                            <li>✘ Ne prouve pas que les données source étaient exactes.</li>
+                            <li>✘ Ne remplace pas la chaîne de conservation des preuves.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">Pour les gros fichiers, lire par blocs évite de charger tout le contenu en mémoire.
+                    Le préfixe du hash sert ici d'identifiant pédagogique, pas de mécanisme de sécurité autonome.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">21 · GitHub · publier le projet</div>
+                <div class="section-head"><span class="num">21</span>
+                    <h2>Organiser le dépôt avant d'activer la CI</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Structure possible</h3>
+                        <div class="code">
+                            <div class="codebar">arborescence</div>
+                            <pre>projet-gps/
+├── input_log.txt
+├── parse_gps.py
+├── output_cleaned.csv
+├── README.md
+└── .github/
+    └── workflows/
+        └── main.yml</pre>
+                        </div>
+                        <p>Selon la politique de l'exercice, le fichier brut peut être fourni par l'enseignant ou exclu
+                            du dépôt s'il contient des données sensibles.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Publier le code</h3>
+                        <div class="code">
+                            <div class="codebar">terminal · dépôt distant déjà créé</div>
+                            <pre>git init
+git add parse_gps.py README.md
+git commit -m "Initialise le parseur GPS"
+git branch -M main
+git remote add origin URL_DU_DEPOT
+git push -u origin main</pre>
+                        </div>
+                        <p>Remplacer <code>URL_DU_DEPOT</code> par l'URL réelle du dépôt. Ne jamais ajouter de clé
+                            privée ni de jeton d'accès au projet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">22 · DevSecOps · CI/CD</div>
+                <div class="section-head"><span class="num">22</span>
+                    <h2>La pipeline teste le projet à chaque changement</h2>
+                </div>
+                <div class="steps">
+                    <div class="step"><b>TRIGGER</b><span>Push ou pull request vers main/master.</span></div>
+                    <div class="step"><b>ENVIRONNEMENT</b><span>Un runner Ubuntu récupère le code.</span></div>
+                    <div class="step"><b>EXÉCUTION</b><span>Python lance le parseur et génère le CSV.</span></div>
+                    <div class="step"><b>VALIDATION</b><span>Le workflow vérifie le fichier et calcule SHA-256.</span>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Pourquoi automatiser ?</h3>
+                        <ul>
+                            <li>Détecter tôt les régressions.</li>
+                            <li>Exécuter les mêmes étapes sur un environnement propre.</li>
+                            <li>Afficher clairement les échecs dans les logs.</li>
+                            <li>Réduire les validations manuelles répétitives.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Le workflow n'est pas magique</h3>
+                        <ul>
+                            <li>Le fichier d'entrée doit être disponible au runner.</li>
+                            <li>Les dépendances doivent être déclarées.</li>
+                            <li>Le script doit retourner un code d'erreur en cas d'échec.</li>
+                            <li>Une empreinte calculée n'est pas, à elle seule, une validation de la qualité des
+                                données.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">23 · GitHub Actions · workflow</div>
+                <div class="section-head"><span class="num">23</span>
+                    <h2>Créer le fichier <code>.github/workflows/main.yml</code></h2>
+                </div>
+                <p class="lead">Placez le workflow dans le dépôt. Il s'exécute sur les push et pull requests vers
+                    main/master, échoue si le fichier d'entrée ou le CSV manque, puis affiche l'empreinte et un
+                    identifiant court.</p>
+                <div class="code">
+                    <div class="codebar">.github/workflows/main.yml</div>
+                    <pre>name: Validation OCLCC Pipeline CI/CD
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  validate-investigation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Exécution du parseur DFIR
+        run: |
+          test -f input_log.txt || {
+            echo "Erreur : input_log.txt introuvable"; exit 1;
+          }
+          python parse_gps.py
+
+      - name: Vérifier le CSV et calculer SHA-256
+        run: |
+          test -f output_cleaned.csv || {
+            echo "Erreur : CSV non généré"; exit 1;
+          }
+          HASH=$(sha256sum output_cleaned.csv | awk '{print $1}')
+          echo "SHA-256 : $HASH"
+          echo "Identifiant pédagogique : FLAG_OCLCC_${HASH:0:12}"</pre>
+                </div>
+                <div class="callout warn">Le nom <code>FLAG_OCLCC_…</code> est une convention d'exercice, pas une preuve
+                    d'enquête. Les caractères spéciaux YAML comme <code>on</code> sont valides dans un workflow GitHub
+                    Actions.</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">24 · Atelier · tests et diagnostic</div>
+                <div class="section-head"><span class="num">24</span>
+                    <h2>Quand la pipeline échoue : enquêter méthodiquement</h2>
+                </div>
+                <div class="grid three">
+                    <div class="card"><span class="tag red">ERREUR</span>
+                        <h3>Fichier introuvable</h3>
+                        <p>Vérifier le nom, la casse, le chemin relatif et le contenu réellement présent dans le dépôt
+                            distant.</p>
+                    </div>
+                    <div class="card"><span class="tag red">ERREUR</span>
+                        <h3>Conversion invalide</h3>
+                        <p>Identifier la ligne fautive, contrôler le format d'entrée et décider d'une politique de rejet
+                            ou de correction.</p>
+                    </div>
+                    <div class="card"><span class="tag red">ERREUR</span>
+                        <h3>CSV non généré</h3>
+                        <p>Vérifier l'appel d'export, le chemin de sortie, les droits et le code de sortie du script.
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Checklist de validation</h3>
+                    <div class="grid">
+                        <div>
+                            <p>□ Le script fonctionne localement sur une copie de test.</p>
+                            <p>□ Le CSV a un en-tête stable et aucune colonne d'index.</p>
+                            <p>□ Les cas vides et mal formés sont testés.</p>
+                        </div>
+                        <div>
+                            <p>□ Le workflow est au bon emplacement.</p>
+                            <p>□ La pipeline est verte sur le dépôt distant.</p>
+                            <p>□ Le hash affiché correspond au CSV généré.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="inner">
+                <div class="eyebrow">25 · Récapitulatif</div>
+                <div class="section-head"><span class="num">25</span>
+                    <h2>Mission : une chaîne de traitement lisible et vérifiable</h2>
+                </div>
+                <div class="steps">
+                    <div class="step"><b>PYTHON</b><span>Lire, analyser, convertir et tester les données.</span></div>
+                    <div class="step"><b>NETTOYAGE</b><span>Appliquer des règles explicites et documentées.</span></div>
+                    <div class="step"><b>GIT</b><span>Tracer le code, signer les commits et publier.</span></div>
+                    <div class="step"><b>CI/CD</b><span>Exécuter et contrôler automatiquement le résultat.</span></div>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Questions de vérification</h3>
+                        <ul>
+                            <li>Pourquoi <code>float("nan")</code> ne déclenche-t-il pas forcément d'exception ?</li>
+                            <li>Quelle est la différence entre <code>git add</code> et <code>git commit</code> ?</li>
+                            <li>Que garantit — et ne garantit pas — SHA-256 ?</li>
+                            <li>Pourquoi tester un parseur sur des cas limites ?</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Pour la prochaine séance</h3>
+                        <p>Apporter un CSV validé, expliquer les règles de nettoyage et préparer une visualisation
+                            cartographique avec Folium ou QGIS.</p>
+                        <p class="subtitle">La qualité d'un résultat dépend autant de la méthode que du code.</p>
+                    </div>
+                </div>
+                <div class="eyebrow" style="color:var(--green)">Fin du support · Questions & discussion</div>
+            </div>
+        </section>
+    </main>
+    <div class="footer"><span id="counter">01 / 25</span>
+        <div class="progress"><span id="progressFill"></span></div><span class="footer-right hintkeys"><span
+                class="key">←</span><span class="key">→</span> naviguer</span><span class="footer-right"
+            id="percent">4%</span>
+    </div>
+    <script>
+        (() => {
+            const slides = [...document.querySelectorAll('.slide')];
+            const counter = document.getElementById('counter');
+            const fill = document.getElementById('progressFill');
+            const percent = document.getElementById('percent');
+            let current = 0;
+            function show(index) {
+                current = Math.max(0, Math.min(slides.length - 1, index));
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === current);
+                    slide.setAttribute('aria-hidden', i === current ? 'false' : 'true');
+                    if (i === current) slide.scrollTop = 0;
+                });
+                const done = Math.round(((current + 1) / slides.length) * 100);
+                counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+                fill.style.width = `${done}%`;
+                percent.textContent = `${done}%`;
+                document.title = `${String(current + 1).padStart(2, '0')} · ${slides[current].querySelector('h1,h2')?.textContent.trim() || 'ACDC80'}`;
+            }
+            document.addEventListener('keydown', e => {
+                if (['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter'].includes(e.key)) {
+                    if (e.target.matches('input,textarea,button,select')) return;
+                    e.preventDefault(); show(current + 1);
+                } else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) {
+                    e.preventDefault(); show(current - 1);
+                } else if (e.key === 'Home') { e.preventDefault(); show(0); }
+                else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1); }
+            });
+            let touchX = null;
+            document.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+            document.addEventListener('touchend', e => {
+                if (touchX === null) return;
+                const delta = e.changedTouches[0].clientX - touchX;
+                if (Math.abs(delta) > 80) show(current + (delta < 0 ? 1 : -1));
+                touchX = null;
+            }, { passive: true });
+            show(0);
+        })();
+    </script>
+</body>
+
+</html>
+```eof
+
+J'ai effectué toutes tes modifications en conservant l'harmonie et l'interactivité d'origine de ton support. Les
+nouvelles slides (comme celle de Fibonacci) respectent exactement le design de tes précédents exercices, les pièges du
+TP sautent aux yeux visuellement et toutes les listes de discours ont été intégrées de manière claire, de sorte qu'elles
+appuient tes paroles sans surcharger la présentation.
